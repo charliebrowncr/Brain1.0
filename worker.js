@@ -11,14 +11,17 @@ const WAZE = 'https://www.waze.com/en/live-map/directions/cr/provincia-de-puntar
 const APP_PAGE = '/Canavida%20App.dc.html';
 
 const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-const json = (d, status = 200) => new Response(JSON.stringify(d), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'content-type' };
+const json = (d, status = 200) => new Response(JSON.stringify(d), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...CORS } });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const addDays = (iso, n) => { const d = new Date(iso.slice(0, 10) + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (req.method === 'OPTIONS' && url.pathname.startsWith('/api/')) return new Response(null, { headers: CORS });
     try {
+      if (url.pathname === '/api/diagnostico') return await diagnostico(env);
       if (url.pathname === '/api/reserva') return await reserva(url, env);
       if (url.pathname === '/api/solicitud' && req.method === 'POST') return await solicitud(await req.json(), env);
       if (url.pathname === '/api/chat' && req.method === 'POST') return await chat(await req.json(), env, url);
@@ -32,6 +35,35 @@ export default {
     return env.ASSETS.fetch(req);
   }
 };
+
+// ─── Diagnóstico: abra /api/diagnostico en el navegador ────────────────
+async function diagnostico(env) {
+  const r = {};
+  const key = (env.LODGIFY_API_KEY || '').trim();
+  r['1_secreto_LODGIFY_API_KEY'] = key ? `OK (${key.length} caracteres, termina en …${key.slice(-4)})` : 'FALTA: Settings → Variables and Secrets → Add → Secret LODGIFY_API_KEY, luego Deploy';
+  r['2_secreto_RESEND_API_KEY'] = env.RESEND_API_KEY ? 'OK' : 'FALTA (solo afecta los correos)';
+  r['3_base_de_datos_D1'] = !env.DB ? 'FALTA el binding DB: revise wrangler.toml' : await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'").all()
+    .then(x => { const t = (x.results || []).map(y => y.name); const need = ['cache', 'knowledge', 'conversaciones', 'solicitudes']; const miss = need.filter(n => !t.includes(n)); return miss.length ? 'FALTAN tablas: ' + miss.join(', ') + ' → ejecute schema.sql en D1 Console' : 'OK'; })
+    .catch(e => 'ERROR: ' + e.message + ' → revise database_id en wrangler.toml');
+  r['4_inteligencia_artificial'] = env.AI ? 'OK' : 'FALTA el bloque [ai] en wrangler.toml';
+  if (key) {
+    try {
+      const res = await fetch('https://api.lodgify.com/v2/properties?page=1&size=5', { headers: { 'X-ApiKey': key, accept: 'application/json' } });
+      const txt = await res.text();
+      if (res.status === 401) r['5_lodgify'] = 'RECHAZADA (401): la API key está mal copiada, fue regenerada, o su plan de Lodgify no incluye API (Starter no la tiene)';
+      else if (!res.ok) r['5_lodgify'] = `ERROR ${res.status}: ${txt.slice(0, 200)}`;
+      else {
+        const d = JSON.parse(txt); const props = d.items || d || [];
+        r['5_lodgify'] = 'OK';
+        r['6_propiedades'] = props.map(p => p.name).slice(0, 10);
+        const b = await fetch('https://api.lodgify.com/v2/reservations/bookings?stayFilter=Upcoming&page=1&size=5&includeExternal=true', { headers: { 'X-ApiKey': key, accept: 'application/json' } });
+        if (!b.ok) r['7_reservas'] = 'ERROR ' + b.status;
+        else { const bd = await b.json(); r['7_reservas'] = (bd.items || []).map(x => `${x.guest?.name} · ${(x.arrival || '').slice(0, 10)} · ${x.rooms?.[0]?.name || x.property_id}`); if (!r['7_reservas'].length) r['7_reservas'] = 'Conectado, pero no hay reservas próximas'; }
+      }
+    } catch (e) { r['5_lodgify'] = 'No se pudo conectar: ' + e.message; }
+  }
+  return json(r);
+}
 
 // ─── Lodgify ────────────────────────────────────────────────────────────
 async function lodgify(path, env) {
@@ -48,6 +80,7 @@ async function lodgify(path, env) {
 
 // Reservas en curso + próximas. Se guardan 10 min en D1 para no saturar Lodgify.
 async function bookings(env) {
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS cache (k TEXT PRIMARY KEY, v TEXT, t INTEGER)').run();
   const row = await env.DB.prepare('SELECT v, t FROM cache WHERE k = ?').bind('bookings').first();
   if (row && Date.now() - row.t < 10 * 60 * 1000) return JSON.parse(row.v);
   const items = [];
@@ -138,6 +171,7 @@ async function solicitud(body, env) {
 <table cellpadding="6" style="border-collapse:collapse;font-family:Georgia,serif">${filas.map(([k, v]) => `<tr><td style="color:#777;border-bottom:1px solid #ddd">${esc(k)}</td><td style="border-bottom:1px solid #ddd">${esc(v)}</td></tr>`).join('')}</table>
 <p style="color:#777">Enviado desde la app de huéspedes de Canavida.</p>`;
 
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS solicitudes (id INTEGER PRIMARY KEY AUTOINCREMENT, reserva TEXT, tipo TEXT, detalle TEXT, fecha TEXT)').run();
   await env.DB.prepare('INSERT INTO solicitudes (reserva, tipo, detalle, fecha) VALUES (?, ?, ?, ?)')
     .bind(String(b.id), tipo, JSON.stringify(detalle), new Date().toISOString()).run();
 
@@ -198,6 +232,10 @@ async function traducir({ lang, texts = [] }, env) {
 
 async function chat({ reserva: r = {}, messages = [], lang = 'es' }, env, url) {
   const last = messages[messages.length - 1]?.content || '';
+  await env.DB.batch([
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS knowledge (id INTEGER PRIMARY KEY AUTOINCREMENT, pregunta TEXT, respuesta TEXT)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS conversaciones (id INTEGER PRIMARY KEY AUTOINCREMENT, reserva TEXT, pregunta TEXT, respuesta TEXT, fecha TEXT)')
+  ]);
   const [lista, kb] = await Promise.all([
     faq(env, url),
     env.DB.prepare('SELECT pregunta, respuesta FROM knowledge ORDER BY id DESC LIMIT 40').all().then(x => x.results || [])
