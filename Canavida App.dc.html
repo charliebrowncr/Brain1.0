@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f2f2">
+<title>Canavida Villas &amp; Resort</title>
+<link rel="stylesheet" href="_ds/classical-2b9a4656-8dcc-4d47-8d3d-afb5d2459be8/styles.css">
+<script src="_ds/classical-2b9a4656-8dcc-4d47-8d3d-afb5d2459be8/_ds_bundle.js"></script>
+<script src="canavida-data.js"></script>
+<style>
+body{margin:0;background:var(--color-bg);-webkit-font-smoothing:antialiased}
+a{color:var(--color-accent-700)}
+a:hover{color:var(--color-accent-600)}
+@keyframes cvPulse{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes cvUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+<div style="max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative">
+
+<sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Landing" style="display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-4) var(--space-4) var(--space-8)">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+    <span style="font-family:var(--font-heading);font-size:22px;font-weight:600;letter-spacing:.02em">Canavida</span>
+    <div style="display:flex;gap:4px">
+      <sc-for list="{{ langs }}" as="l" hint-placeholder-count="4">
+        <button onClick="{{ l.onClick }}" aria-label="{{ l.name }}" style="min-width:36px;height:32px;padding:0 6px;background:transparent;border-radius:var(--radius-md);font-family:var(--font-body);font-size:11px;letter-spacing:.08em;cursor:pointer;border:1px solid {{ l.border }};color:{{ l.color }}">{{ l.code }}</button>
+      </sc-for>
+    </div>
+  </div>
+  <img class="plate" src="villa-1.jpg" alt="Canavida" style="width:100%;aspect-ratio:4/3;object-fit:cover">
+  <div>
+    <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">{{ t.portal }}</div>
+    <h1 style="font-size:40px;font-weight:400;line-height:1.05;margin:0 0 var(--space-3)">{{ t.welcome }}</h1>
+    <p style="font-size:15px;line-height:1.6;text-align:justify;hyphens:auto;margin:0;color:var(--color-neutral-800)">{{ t.intro }}</p>
+  </div>
+  <form onSubmit="{{ onLookup }}" style="display:flex;flex-direction:column;gap:var(--space-3)">
+    <div class="field"><label for="cv-first">{{ t.first }}</label><input id="cv-first" class="input" style="min-height:48px;font-size:16px" value="{{ first }}" onChange="{{ onFirst }}" autocomplete="given-name" placeholder="María"></div>
+    <div class="field"><label for="cv-last">{{ t.last }}</label><input id="cv-last" class="input" style="min-height:48px;font-size:16px" value="{{ last }}" onChange="{{ onLast }}" autocomplete="family-name" placeholder="Fernández"></div>
+    <button type="submit" class="btn btn-primary btn-block" style="min-height:48px;font-size:17px" disabled="{{ loading }}">{{ ctaLabel }}</button>
+  </form>
+  <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:center;gap:var(--space-2);font-size:13px;color:var(--color-neutral-700)">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);animation:cvPulse 1s infinite"></span>
+      <span>{{ t.checking }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+    <div class="card" style="border-color:var(--color-accent-400)">
+      <div class="card-kicker" style="color:var(--color-accent-700)">{{ t.nfKicker }}</div>
+      <p class="card-body" style="opacity:1;font-size:14px">{{ error }}</p>
+      <a href="{{ waLink }}" target="_blank" rel="noopener" class="btn btn-secondary" style="align-self:flex-start">{{ t.wa }}</a>
+    </div>
+  </sc-if>
+  <div style="font-size:11px;color:var(--color-neutral-700);text-align:center;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">Villas &amp; Resort · Uvita · Puntarenas · Costa Rica</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;min-height:100vh">
+  <div style="position:sticky;top:0;z-index:5;background:var(--color-bg);display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--color-divider)">
+    <span style="font-family:var(--font-heading);font-size:20px;font-weight:600;margin-right:auto">Canavida</span>
+    <div style="display:flex;gap:3px">
+      <sc-for list="{{ langs }}" as="l" hint-placeholder-count="4">
+        <button onClick="{{ l.onClick }}" aria-label="{{ l.name }}" style="min-width:32px;height:30px;padding:0 4px;background:transparent;border-radius:var(--radius-md);font-family:var(--font-body);font-size:10.5px;letter-spacing:.06em;cursor:pointer;border:1px solid {{ l.border }};color:{{ l.color }}">{{ l.code }}</button>
+      </sc-for>
+    </div>
+    <button class="btn btn-ghost" style="font-size:13px;min-height:36px" onClick="{{ onLogout }}">{{ t.logout }}</button>
+  </div>
+  <sc-if value="{{ demo }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:6px var(--space-4);border-bottom:1px solid var(--color-divider);display:flex"><span class="tag tag-accent">{{ t.demo }}</span></div>
+  </sc-if>
+
+  <div style="flex:1;padding:var(--space-6) var(--space-4) 96px">
+
+  <sc-if value="{{ tabIs.reserva }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Mi reserva" style="display:flex;flex-direction:column;gap:var(--space-4)">
+    <div>
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">{{ t.stay }}</div>
+      <h1 style="font-size:40px;font-weight:400;line-height:1.05;margin:0 0 var(--space-2)">{{ t.hello }} {{ res.first }}</h1>
+      <p style="margin:0;font-size:15px;color:var(--color-neutral-800)">{{ t.awaits }} <em>{{ res.villa }}</em>.</p>
+    </div>
+    <img class="plate" src="{{ villaPhoto }}" alt="{{ res.villa }}" style="width:100%;aspect-ratio:16/10;object-fit:cover">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+      <div style="padding:var(--space-3) var(--space-3) var(--space-3) 0;border-bottom:1px solid var(--color-divider);border-right:1px solid var(--color-divider)">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">{{ t.arrival }}</div>
+        <div style="font-family:var(--font-heading);font-size:24px;line-height:1.15;margin-top:4px">{{ arriveFmt }}</div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">{{ t.cin }}</div>
+      </div>
+      <div style="padding:var(--space-3) 0 var(--space-3) var(--space-3);border-bottom:1px solid var(--color-divider)">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">{{ t.departure }}</div>
+        <div style="font-family:var(--font-heading);font-size:24px;line-height:1.15;margin-top:4px">{{ departFmt }}</div>
+        <div style="font-size:12px;color:var(--color-neutral-700)">{{ t.cout }}</div>
+      </div>
+      <div style="padding:var(--space-3) var(--space-3) var(--space-3) 0;border-bottom:1px solid var(--color-divider);border-right:1px solid var(--color-divider)">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">{{ t.guests }}</div>
+        <div style="font-family:var(--font-heading);font-size:24px;margin-top:4px;font-feature-settings:'tnum'">{{ res.guests }}</div>
+      </div>
+      <div style="padding:var(--space-3) 0 var(--space-3) var(--space-3);border-bottom:1px solid var(--color-divider)">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">{{ t.nights }}</div>
+        <div style="font-family:var(--font-heading);font-size:24px;margin-top:4px;font-feature-settings:'tnum'">{{ nights }}</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--color-neutral-700);font-feature-settings:'tnum'">{{ t.bookingNo }} {{ res.code }}</div>
+
+    <div style="margin-top:var(--space-4)">
+      <h2 style="font-size:28px;font-weight:400;margin:0 0 var(--space-1)">{{ t.improveT }}</h2>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-700);text-align:justify">{{ t.improveB }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider)">
+      <sc-for list="{{ offers }}" as="o" hint-placeholder-count="5">
+        <button onClick="{{ o.onClick }}" disabled="{{ o.disabled }}" style="display:flex;align-items:center;gap:var(--space-3);width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--color-divider);padding:var(--space-3) 0;min-height:64px;font:inherit;color:inherit;cursor:pointer;opacity:{{ o.opacity }}" style-hover="background:color-mix(in srgb, var(--color-accent) 6%, transparent)">
+          <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+            <span style="font-family:var(--font-heading);font-size:19px;font-weight:600">{{ o.title }}</span>
+            <span style="font-size:12.5px;color:var(--color-neutral-700)">{{ o.desc }}</span>
+          </span>
+          <span style="font-size:12px;color:var(--color-accent-700);font-feature-settings:'tnum';text-align:right;max-width:90px">{{ o.status }}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+
+    <div class="card" style="margin-top:var(--space-4);flex-direction:row;align-items:center;gap:var(--space-3)">
+      <div style="flex:1">
+        <div class="card-title">{{ t.qT }}</div>
+        <p class="card-body" style="opacity:1;color:var(--color-neutral-700)">{{ t.qB }}</p>
+      </div>
+      <button class="btn btn-primary" onClick="{{ goChat }}">{{ t.ask }}</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabIs.tours }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Tours" style="display:flex;flex-direction:column;gap:var(--space-4)">
+    <div>
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">{{ t.toursK }}</div>
+      <h1 style="font-size:36px;font-weight:400;line-height:1.05;margin:0 0 var(--space-2)">{{ t.toursT }}</h1>
+      <p style="margin:0;font-size:14px;color:var(--color-neutral-800);text-align:justify">{{ t.toursB }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider)">
+      <sc-for list="{{ tours }}" as="tr" hint-placeholder-count="8">
+        <button onClick="{{ tr.onClick }}" style="display:flex;align-items:baseline;gap:var(--space-3);width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--color-divider);padding:var(--space-3) 0;min-height:56px;font:inherit;color:inherit;cursor:pointer" style-hover="background:color-mix(in srgb, var(--color-accent) 6%, transparent)">
+          <span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700);font-feature-settings:'tnum';width:22px">{{ tr.n }}</span>
+          <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+            <span style="font-family:var(--font-heading);font-size:19px;font-weight:600">{{ tr.title }}</span>
+            <span style="font-size:12px;color:var(--color-neutral-700)">{{ tr.time }}</span>
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="align-self:center"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabIs.llegar }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Cómo llegar" style="display:flex;flex-direction:column;gap:var(--space-4)">
+    <div>
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">{{ t.dirK }}</div>
+      <h1 style="font-size:36px;font-weight:400;line-height:1.05;margin:0">{{ t.dirT }}</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider)">
+      <div style="display:grid;grid-template-columns:56px 1fr;gap:var(--space-3);padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:var(--font-heading);font-size:56px;line-height:.85;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">1</span>
+        <div>
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:4px">{{ t.s1L }}</div>
+          <p style="margin:0;font-family:var(--font-heading);font-size:22px;line-height:1.25">{{ t.s1 }}</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:56px 1fr;gap:var(--space-3);padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:var(--font-heading);font-size:56px;line-height:.85;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">2</span>
+        <div>
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:4px">{{ t.s2L }}</div>
+          <p style="margin:0;font-family:var(--font-heading);font-size:22px;line-height:1.25">{{ t.s2 }}</p>
+        </div>
+      </div>
+    </div>
+    <a href="https://www.waze.com/en/live-map/directions/cr/provincia-de-puntarenas/uvita/canavida-villas-and-resort?place=ChIJz3gMGphXoY8R1QERaYsYZdg" target="_blank" rel="noopener" class="btn btn-primary btn-block" style="min-height:52px;font-size:17px;gap:10px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+      {{ t.waze }}
+    </a>
+    <img class="plate" src="villa-2.jpg" alt="Canavida" style="width:100%;aspect-ratio:16/10;object-fit:cover;margin-top:var(--space-2)">
+    <p style="margin:0;font-size:13px;color:var(--color-neutral-700);text-align:justify">{{ t.airport }}</p>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabIs.chat }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Asistente" style="display:flex;flex-direction:column;gap:var(--space-3)">
+    <div>
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">{{ t.chatK }}</div>
+      <h1 style="font-size:36px;font-weight:400;line-height:1.05;margin:0">{{ t.chatT }}</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);border-top:1px solid var(--color-divider);padding-top:var(--space-4)">
+      <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="1">
+        <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+          <div style="align-self:flex-end;max-width:82%;border:1px solid var(--color-accent);border-radius:var(--radius-lg);padding:var(--space-2) var(--space-3);font-size:14px;line-height:1.5;color:var(--color-accent-800)">{{ m.text }}</div>
+        </sc-if>
+        <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+          <div style="align-self:flex-start;max-width:92%;display:flex;flex-direction:column;gap:var(--space-2)">
+            <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Canavida</div>
+            <div style="font-size:14px;line-height:1.6;white-space:pre-line;border-left:1px solid var(--color-divider);padding-left:var(--space-3)">{{ m.text }}</div>
+            <sc-if value="{{ m.handoff }}" hint-placeholder-val="{{ false }}">
+              <button class="btn btn-secondary" style="align-self:flex-start;margin-left:var(--space-3)" onClick="{{ m.onHandoff }}">{{ t.toTeam }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+      <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:5px;padding-left:var(--space-3)">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);animation:cvPulse 1s infinite"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);animation:cvPulse 1s .2s infinite"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);animation:cvPulse 1s .4s infinite"></span>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ showChips }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-2)">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+          <button class="btn btn-secondary" style="font-size:13px;min-height:40px;white-space:nowrap;flex:none" onClick="{{ c.onClick }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <form onSubmit="{{ onAsk }}" style="position:sticky;bottom:72px;display:flex;gap:var(--space-2);padding:var(--space-3) 0;background:var(--color-bg);border-top:1px solid var(--color-divider);margin-top:var(--space-2)">
+      <input class="input" style="min-height:48px;font-size:16px;flex:1" value="{{ draft }}" onChange="{{ onDraft }}" placeholder="{{ t.ph }}">
+      <button type="submit" class="btn btn-primary" style="width:48px;height:48px;padding:0" aria-label="{{ t.submit }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>
+      </button>
+    </form>
+  </div>
+  </sc-if>
+
+  </div>
+
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);background:var(--color-bg);border-top:1px solid var(--color-divider);padding-bottom:env(safe-area-inset-bottom)">
+    <button onClick="{{ tab.reserva }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;min-height:60px;background:transparent;border:0;border-top:1px solid {{ tabLine.reserva }};margin-top:-1px;font:inherit;font-size:11px;cursor:pointer;color:{{ tabColor.reserva }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+      {{ t.tabRes }}
+    </button>
+    <button onClick="{{ tab.tours }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;min-height:60px;background:transparent;border:0;border-top:1px solid {{ tabLine.tours }};margin-top:-1px;font:inherit;font-size:11px;cursor:pointer;color:{{ tabColor.tours }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+      Tours
+    </button>
+    <button onClick="{{ tab.llegar }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;min-height:60px;background:transparent;border:0;border-top:1px solid {{ tabLine.llegar }};margin-top:-1px;font:inherit;font-size:11px;cursor:pointer;color:{{ tabColor.llegar }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      {{ t.tabDir }}
+    </button>
+    <button onClick="{{ tab.chat }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 9px;min-height:60px;background:transparent;border:0;border-top:1px solid {{ tabLine.chat }};margin-top:-1px;font:inherit;font-size:11px;cursor:pointer;color:{{ tabColor.chat }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+      {{ t.chatK }}
+    </button>
+  </nav>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasSheet }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSheet }}" style="position:fixed;inset:0;z-index:20;background:color-mix(in srgb, var(--color-neutral-900) 45%, transparent);display:flex;align-items:flex-end;justify-content:center">
+  <div onClick="{{ stop }}" style="width:100%;max-width:480px;max-height:90vh;overflow-y:auto;background:var(--color-bg);border-radius:var(--radius-lg) var(--radius-lg) 0 0;box-shadow:var(--shadow-lg);padding:var(--space-4) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));animation:cvUp .28s ease-out;display:flex;flex-direction:column;gap:var(--space-3)">
+    <div style="display:flex;align-items:flex-start;gap:var(--space-2)">
+      <div style="flex:1">
+        <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-1)">{{ sh.kicker }}</div>
+        <h2 style="font-size:28px;font-weight:400;margin:0">{{ sh.title }}</h2>
+      </div>
+      <button class="btn btn-ghost btn-icon" onClick="{{ closeSheet }}" aria-label="×"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    </div>
+
+    <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4) 0;border-top:1px solid var(--color-divider)">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <h3 style="margin:0;font-weight:400">{{ t.sentT }}</h3>
+        <p style="margin:0;font-size:14px;color:var(--color-neutral-800);text-align:justify">{{ t.sentB }}</p>
+        <button class="btn btn-primary btn-block" style="min-height:48px" onClick="{{ closeSheet }}">{{ t.done }}</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ sh.body }}" hint-placeholder-val="{{ true }}">
+        <p style="margin:0;font-size:14px;line-height:1.6;color:var(--color-neutral-800);text-align:justify;white-space:pre-line">{{ sh.body }}</p>
+      </sc-if>
+      <sc-for list="{{ sh.facts }}" as="f" hint-placeholder-count="0">
+        <div style="border-top:1px solid var(--color-divider);padding-top:var(--space-2)">
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:4px">{{ f.label }}</div>
+          <div style="font-size:13.5px;line-height:1.55;white-space:pre-line">{{ f.value }}</div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ sh.loc }}" hint-placeholder-val="{{ false }}">
+        <a href="{{ sh.loc }}" target="_blank" rel="noopener" style="font-size:13px">{{ t.map }}</a>
+      </sc-if>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+        <sc-if value="{{ sh.showNights }}" hint-placeholder-val="{{ false }}">
+          <div class="field"><label>{{ t.nightsL }}</label>
+            <div style="display:flex;gap:var(--space-2)">
+              <sc-for list="{{ nightOpts }}" as="n" hint-placeholder-count="2">
+                <button onClick="{{ n.onClick }}" style="flex:1;min-height:48px;border-radius:var(--radius-md);background:transparent;font-family:var(--font-heading);font-size:20px;cursor:pointer;font-feature-settings:'tnum';border:1px solid {{ n.border }};color:{{ n.color }}">{{ n.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sh.showTourFields }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:var(--space-2)">
+            <div class="field"><label for="cv-date">{{ t.dateL }}</label><input id="cv-date" type="date" class="input" style="min-height:48px;font-size:16px" value="{{ form.date }}" onChange="{{ onDate }}" min="{{ res.arrival }}" max="{{ res.departure }}"></div>
+            <div class="field"><label for="cv-ppl">{{ t.pplL }}</label><input id="cv-ppl" type="number" min="1" class="input" style="min-height:48px;font-size:16px" value="{{ form.people }}" onChange="{{ onPeople }}"></div>
+          </div>
+        </sc-if>
+        <div class="field"><label for="cv-note">{{ sh.noteLabel }}</label><textarea id="cv-note" class="input" style="font-size:16px;min-height:72px" value="{{ form.note }}" onChange="{{ onNote }}" placeholder="{{ sh.notePh }}"></textarea></div>
+        <sc-if value="{{ sh.price }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);font-size:13px;color:var(--color-neutral-700)"><span>{{ t.price }}</span><span style="font-family:var(--font-heading);font-size:20px;color:var(--color-text);font-feature-settings:'tnum';text-align:right">{{ sh.price }}</span></div>
+        </sc-if>
+        <sc-if value="{{ sendErr }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:0;font-size:13px;color:var(--color-accent-800)">{{ sendErr }}</p>
+        </sc-if>
+        <button class="btn btn-primary btn-block" style="min-height:48px;font-size:16px" onClick="{{ onSubmit }}" disabled="{{ sending }}">{{ submitLabel }}</button>
+        <p style="margin:0;font-size:11.5px;color:var(--color-neutral-700);text-align:center">{{ t.foot }}</p>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:860},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;reserva&quot;,&quot;tours&quot;,&quot;llegar&quot;,&quot;chat&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista previa&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;es&quot;,&quot;en&quot;,&quot;fr&quot;,&quot;de&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista previa&quot;},&quot;forceDemo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Conexión&quot;},&quot;apiBase&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Conexión&quot;}}">
+const KEY = 'canavida.res', LKEY = 'canavida.lang';
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const clean = s => (s || '').replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\uFE0F\u200D\u2070-\u209F]/gu, '').replace(/[ \t]{2,}/g, ' ').replace(/ +\n/g, '\n').trim();
+const LOCALE = { es: 'es-CR', en: 'en-US', fr: 'fr-FR', de: 'de-DE' };
+const LANGS = [['es', 'ES', 'Español'], ['en', 'EN', 'English'], ['fr', 'FR', 'Français'], ['de', 'DE', 'Deutsch']];
+const DEMO_OFFERS = [
+  { extendNights: 2, early: true, late: false, wine: true },
+  { extendNights: 0, early: true, late: true, wine: true },
+  { extendNights: 3, early: false, late: true, wine: true }
+];
+const P22 = '$22 · ₡10 000', WINE = '$40';
+
+const STR = {
+  es: {
+    portal: 'Portal del huésped', welcome: 'Bienvenido a Canavida',
+    intro: 'Escriba el nombre y los apellidos de la persona a cuyo nombre está la reserva. Verificamos su estadía directamente en nuestro sistema de reservas.',
+    first: 'Nombre', last: 'Apellidos', cta: 'Ver mi reserva', ctaBusy: 'Verificando reserva…', checking: 'Consultando Lodgify…',
+    nfKicker: 'No encontramos la reserva', wa: 'Escribir por WhatsApp', demo: 'Modo demo', logout: 'Salir',
+    stay: 'Su estadía', hello: 'Hola,', awaits: 'Le esperamos en', arrival: 'Llegada', departure: 'Salida',
+    cin: 'Check-in 3:00 p.m.', cout: 'Check-out 11:00 a.m.', guests: 'Huéspedes', nights: 'Noches', bookingNo: 'Reserva n.º',
+    improveT: 'Mejore su estadía', improveB: 'Las opciones se habilitan según el calendario de su villa en este momento. El equipo confirma cada solicitud por correo.',
+    extT: 'Extender estadía', extD: n => `Hasta ${n} noche${n > 1 ? 's' : ''} libre${n > 1 ? 's' : ''} después de su salida`, extNo: 'Su villa ya está reservada después de su salida',
+    earlyT: 'Early check-in', earlyD: 'Llegada entre 11:00 a.m. y 1:30 p.m.', earlyNo: 'Otro huésped sale de su villa ese día',
+    lateT: 'Late check-out', lateD: 'Salida hasta la 1:00 p.m.', lateNo: 'Otro huésped llega a su villa ese día',
+    wineT: 'Botella de vino', wineD: 'Esperándole en la villa a su llegada',
+    upT: 'Upgrade de villa', upD: 'Más habitaciones u otra villa, mismas fechas',
+    rate: 'Tarifa por correo', consult: 'Consultar', na: 'No disponible',
+    qT: '¿Tiene alguna duda?', qB: 'Wi-Fi, cocina, piscina, transporte: el asistente responde al momento.', ask: 'Preguntar',
+    toursK: 'Experiencias', toursT: 'Tours en Uvita y alrededores', toursB: 'Elija una experiencia y envíenos la fecha que le interesa. El equipo confirma disponibilidad y precio por correo.', tbd: 'Horario a coordinar',
+    dirK: 'Cómo llegar', dirT: 'Camino a Canavida', s1L: 'La entrada', s1: 'En la entrada al frente a Mystic Sushi o la entrada a Invictus.',
+    s2L: 'El vehículo', s2: 'Recomendable 4x4, pero el camino está para todo tipo de vehículos.', waze: 'Abrir ruta en Waze',
+    airport: 'Desde el aeropuerto Juan Santamaría (SJO) son 167 km, entre 2.5 y 3.5 horas según el tráfico. Si llega en un vehículo 2x4, recomendamos hacer la primera llegada de día.',
+    chatK: 'Asistente', chatT: 'Pregúntenos', greet: (f, v) => `Hola ${f}. Soy el asistente de Canavida. Pregúnteme lo que necesite sobre ${v}, su llegada o los tours.`,
+    ph: 'Escriba su pregunta', toTeam: 'Enviar mi pregunta al equipo',
+    chips: ['Wi-Fi', '¿Necesito 4x4?', '¿Hay aire acondicionado?', '¿Dónde dejo la basura?', 'Pedir comida o taxi'],
+    tabRes: 'Mi reserva', tabDir: 'Cómo llegar',
+    sentT: 'Solicitud enviada', sentB: 'El equipo de Canavida recibió su solicitud y le confirmará disponibilidad y forma de pago en breve.', done: 'Listo',
+    nightsL: 'Noches adicionales', dateL: 'Fecha deseada', pplL: 'Personas', noteL: 'Nota para el equipo (opcional)', price: 'Precio',
+    sendErr: 'No pudimos enviar la solicitud. Intente de nuevo o escríbanos por WhatsApp.', submit: 'Enviar solicitud', sending: 'Enviando…',
+    foot: 'Se envía al equipo de Canavida con los datos de su reserva.', map: 'Ver ubicación en el mapa',
+    facts: { time: 'Horario', inc: 'Incluye', recs: 'Recomendaciones', restr: 'Restricciones', season: 'Temporada' }, tourK: 'Tour', tourPh: 'Edades, idioma, preguntas…',
+    extK: 'Su villa está libre', extB: n => `Hay ${n} noche${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''} justo después de su salida. Elija cuántas quiere agregar y el equipo le envía la tarifa por correo para confirmar.`, extPrice: 'Se la enviamos por correo',
+    earlyK: 'Llegada anticipada', earlyB: 'Llegada entre las 11:00 a.m. y la 1:30 p.m., en lugar de las 3:00 p.m. Ningún huésped sale de su villa ese día.', earlyPh: 'Hora aproximada de llegada',
+    lateK: 'Salida tardía', lateB: 'Dos horas extra: salida hasta la 1:00 p.m., en lugar de las 11:00 a.m. Nadie llega a su villa ese día.',
+    wineK: 'Para su llegada', wineB: 'Una botella de vino esperándole en la villa. Indíquenos si prefiere tinto, blanco o espumante.', winePh: 'Tinto, blanco o espumante',
+    upK: 'Cambio de villa', upB: 'Si necesita más habitaciones o prefiere otra villa, revisamos qué está libre para sus mismas fechas y le enviamos las opciones.', upNote: '¿Qué está buscando?', upPh: 'Una habitación más, aire acondicionado en todas…',
+    conT: 'Enviar al equipo', conB: q => `Su pregunta: “${q}”\nEl equipo le responde por correo.`, conNote: 'Algo más que debamos saber (opcional)',
+    errEmpty: 'Escriba su nombre y sus apellidos tal como aparecen en la reserva.',
+    errNF: 'No hay una reserva activa o próxima con ese nombre. Revise que esté escrito igual que en su confirmación, o escríbanos.',
+    errConn: 'No pudimos conectar con el sistema de reservas en este momento. Intente de nuevo en unos minutos o escríbanos.',
+    errDemo: 'Modo demo: pruebe con María Fernández, James Whitaker o Sophie Laurent.',
+    dirAns: 'Tome la entrada al frente a Mystic Sushi o la entrada a Invictus. Recomendable 4x4, pero el camino está para todo tipo de vehículos. La ruta en Waze está en la pestaña Cómo llegar.',
+    unknown: 'No tengo esa respuesta todavía. Puedo pasar su pregunta al equipo y le responden por correo.'
+  },
+  en: {
+    portal: 'Guest portal', welcome: 'Welcome to Canavida',
+    intro: 'Enter the first and last name of the person the booking is under. We check your stay directly in our reservation system.',
+    first: 'First name', last: 'Last name', cta: 'See my booking', ctaBusy: 'Checking booking…', checking: 'Checking Lodgify…',
+    nfKicker: 'Booking not found', wa: 'Message us on WhatsApp', demo: 'Demo mode', logout: 'Sign out',
+    stay: 'Your stay', hello: 'Hello,', awaits: 'We look forward to welcoming you at', arrival: 'Arrival', departure: 'Departure',
+    cin: 'Check-in 3:00 p.m.', cout: 'Check-out 11:00 a.m.', guests: 'Guests', nights: 'Nights', bookingNo: 'Booking no.',
+    improveT: 'Enhance your stay', improveB: 'Options are enabled based on your villa’s calendar right now. Our team confirms every request by email.',
+    extT: 'Extend your stay', extD: n => `Up to ${n} free night${n > 1 ? 's' : ''} after your departure`, extNo: 'Your villa is booked after your departure',
+    earlyT: 'Early check-in', earlyD: 'Arrive between 11:00 a.m. and 1:30 p.m.', earlyNo: 'Another guest leaves your villa that day',
+    lateT: 'Late check-out', lateD: 'Leave as late as 1:00 p.m.', lateNo: 'Another guest arrives at your villa that day',
+    wineT: 'Bottle of wine', wineD: 'Waiting in your villa when you arrive',
+    upT: 'Villa upgrade', upD: 'More bedrooms or another villa, same dates',
+    rate: 'Rate by email', consult: 'Ask', na: 'Not available',
+    qT: 'Any questions?', qB: 'Wi-Fi, kitchen, pool, transport: the assistant answers right away.', ask: 'Ask',
+    toursK: 'Experiences', toursT: 'Tours in Uvita and nearby', toursB: 'Pick an experience and send us the date you have in mind. Our team confirms availability and price by email.', tbd: 'Time to be arranged',
+    dirK: 'Directions', dirT: 'Getting to Canavida', s1L: 'The entrance', s1: 'Take the entrance across from Mystic Sushi or the Invictus entrance.',
+    s2L: 'Your vehicle', s2: 'A 4x4 is recommended, but the road is fine for all types of vehicles.', waze: 'Open route in Waze',
+    airport: 'From Juan Santamaría Airport (SJO) it is 167 km, 2.5 to 3.5 hours depending on traffic. If you drive a 2WD, we recommend arriving in daylight the first time.',
+    chatK: 'Assistant', chatT: 'Ask us', greet: (f, v) => `Hello ${f}. I’m the Canavida assistant. Ask me anything about ${v}, your arrival or the tours.`,
+    ph: 'Type your question', toTeam: 'Send my question to the team',
+    chips: ['Wi-Fi', 'Do I need a 4x4?', 'Is there air conditioning?', 'Where does the garbage go?', 'Order food or a taxi'],
+    tabRes: 'My booking', tabDir: 'Directions',
+    sentT: 'Request sent', sentB: 'The Canavida team received your request and will confirm availability and payment shortly.', done: 'Done',
+    nightsL: 'Extra nights', dateL: 'Preferred date', pplL: 'People', noteL: 'Note for the team (optional)', price: 'Price',
+    sendErr: 'We couldn’t send your request. Please try again or message us on WhatsApp.', submit: 'Send request', sending: 'Sending…',
+    foot: 'Sent to the Canavida team with your booking details.', map: 'View location on map',
+    facts: { time: 'Schedule', inc: 'Includes', recs: 'What to bring', restr: 'Restrictions', season: 'Season' }, tourK: 'Tour', tourPh: 'Ages, language, questions…',
+    extK: 'Your villa is free', extB: n => `${n} night${n > 1 ? 's are' : ' is'} available right after your departure. Choose how many to add and our team will email you the rate to confirm.`, extPrice: 'Sent to you by email',
+    earlyK: 'Early arrival', earlyB: 'Arrive between 11:00 a.m. and 1:30 p.m. instead of 3:00 p.m. No guest leaves your villa that day.', earlyPh: 'Approximate arrival time',
+    lateK: 'Late departure', lateB: 'Two extra hours: leave by 1:00 p.m. instead of 11:00 a.m. No one arrives at your villa that day.',
+    wineK: 'For your arrival', wineB: 'A bottle of wine waiting in your villa. Let us know if you prefer red, white or sparkling.', winePh: 'Red, white or sparkling',
+    upK: 'Change villa', upB: 'If you need more bedrooms or prefer another villa, we check what is free for your same dates and send you the options.', upNote: 'What are you looking for?', upPh: 'One more bedroom, A/C in every room…',
+    conT: 'Send to the team', conB: q => `Your question: “${q}”\nThe team will reply by email.`, conNote: 'Anything else we should know (optional)',
+    errEmpty: 'Enter your first and last name as they appear on the booking.',
+    errNF: 'There is no current or upcoming booking under that name. Check it matches your confirmation, or message us.',
+    errConn: 'We couldn’t reach the reservation system right now. Please try again in a few minutes or message us.',
+    errDemo: 'Demo mode: try María Fernández, James Whitaker or Sophie Laurent.',
+    dirAns: 'Take the entrance across from Mystic Sushi or the Invictus entrance. A 4x4 is recommended, but the road is fine for all vehicles. The Waze route is in the Directions tab.',
+    unknown: 'I don’t have that answer yet. I can pass your question to the team and they’ll reply by email.'
+  },
+  fr: {
+    portal: 'Espace client', welcome: 'Bienvenue à Canavida',
+    intro: 'Saisissez le prénom et le nom de la personne au nom de laquelle la réservation a été faite. Nous vérifions votre séjour directement dans notre système de réservation.',
+    first: 'Prénom', last: 'Nom', cta: 'Voir ma réservation', ctaBusy: 'Vérification…', checking: 'Consultation de Lodgify…',
+    nfKicker: 'Réservation introuvable', wa: 'Écrire sur WhatsApp', demo: 'Mode démo', logout: 'Quitter',
+    stay: 'Votre séjour', hello: 'Bonjour', awaits: 'Nous vous attendons à', arrival: 'Arrivée', departure: 'Départ',
+    cin: 'Arrivée à 15 h', cout: 'Départ à 11 h', guests: 'Voyageurs', nights: 'Nuits', bookingNo: 'Réservation n°',
+    improveT: 'Améliorez votre séjour', improveB: 'Les options s’activent selon le calendrier actuel de votre villa. L’équipe confirme chaque demande par e-mail.',
+    extT: 'Prolonger le séjour', extD: n => `Jusqu’à ${n} nuit${n > 1 ? 's' : ''} libre${n > 1 ? 's' : ''} après votre départ`, extNo: 'Votre villa est réservée après votre départ',
+    earlyT: 'Arrivée anticipée', earlyD: 'Arrivée entre 11 h et 13 h 30', earlyNo: 'Un autre client quitte votre villa ce jour-là',
+    lateT: 'Départ tardif', lateD: 'Départ jusqu’à 13 h', lateNo: 'Un autre client arrive dans votre villa ce jour-là',
+    wineT: 'Bouteille de vin', wineD: 'Vous attend dans la villa à votre arrivée',
+    upT: 'Surclassement de villa', upD: 'Plus de chambres ou une autre villa, mêmes dates',
+    rate: 'Tarif par e-mail', consult: 'Demander', na: 'Indisponible',
+    qT: 'Une question ?', qB: 'Wi-Fi, cuisine, piscine, transport : l’assistant répond tout de suite.', ask: 'Demander',
+    toursK: 'Expériences', toursT: 'Excursions à Uvita et aux alentours', toursB: 'Choisissez une expérience et envoyez-nous la date souhaitée. L’équipe confirme la disponibilité et le prix par e-mail.', tbd: 'Horaire à convenir',
+    dirK: 'Itinéraire', dirT: 'Venir à Canavida', s1L: 'L’entrée', s1: 'Prenez l’entrée en face de Mystic Sushi ou l’entrée d’Invictus.',
+    s2L: 'Le véhicule', s2: 'Un 4x4 est recommandé, mais la route convient à tous les véhicules.', waze: 'Ouvrir l’itinéraire dans Waze',
+    airport: 'Depuis l’aéroport Juan Santamaría (SJO) : 167 km, de 2 h 30 à 3 h 30 selon la circulation. En véhicule 2 roues motrices, nous conseillons d’arriver de jour la première fois.',
+    chatK: 'Assistant', chatT: 'Posez votre question', greet: (f, v) => `Bonjour ${f}. Je suis l’assistant de Canavida. Posez-moi vos questions sur ${v}, votre arrivée ou les excursions.`,
+    ph: 'Écrivez votre question', toTeam: 'Envoyer ma question à l’équipe',
+    chips: ['Wi-Fi', 'Faut-il un 4x4 ?', 'Y a-t-il la climatisation ?', 'Où jeter les poubelles ?', 'Commander un repas ou un taxi'],
+    tabRes: 'Réservation', tabDir: 'Itinéraire',
+    sentT: 'Demande envoyée', sentB: 'L’équipe de Canavida a reçu votre demande et vous confirmera la disponibilité et le paiement sous peu.', done: 'Terminé',
+    nightsL: 'Nuits supplémentaires', dateL: 'Date souhaitée', pplL: 'Personnes', noteL: 'Note pour l’équipe (facultatif)', price: 'Prix',
+    sendErr: 'Impossible d’envoyer la demande. Réessayez ou écrivez-nous sur WhatsApp.', submit: 'Envoyer la demande', sending: 'Envoi…',
+    foot: 'Envoyé à l’équipe de Canavida avec les détails de votre réservation.', map: 'Voir sur la carte',
+    facts: { time: 'Horaires', inc: 'Inclus', recs: 'À prévoir', restr: 'Restrictions', season: 'Saison' }, tourK: 'Excursion', tourPh: 'Âges, langue, questions…',
+    extK: 'Votre villa est libre', extB: n => `${n} nuit${n > 1 ? 's sont disponibles' : ' est disponible'} juste après votre départ. Choisissez combien en ajouter et l’équipe vous enverra le tarif par e-mail.`, extPrice: 'Envoyé par e-mail',
+    earlyK: 'Arrivée anticipée', earlyB: 'Arrivée entre 11 h et 13 h 30 au lieu de 15 h. Aucun client ne quitte votre villa ce jour-là.', earlyPh: 'Heure d’arrivée approximative',
+    lateK: 'Départ tardif', lateB: 'Deux heures de plus : départ jusqu’à 13 h au lieu de 11 h. Personne n’arrive dans votre villa ce jour-là.',
+    wineK: 'Pour votre arrivée', wineB: 'Une bouteille de vin vous attend dans la villa. Dites-nous si vous préférez rouge, blanc ou pétillant.', winePh: 'Rouge, blanc ou pétillant',
+    upK: 'Changer de villa', upB: 'Besoin de plus de chambres ou d’une autre villa ? Nous vérifions ce qui est libre aux mêmes dates et vous envoyons les options.', upNote: 'Que recherchez-vous ?', upPh: 'Une chambre de plus, la climatisation partout…',
+    conT: 'Envoyer à l’équipe', conB: q => `Votre question : « ${q} »\nL’équipe vous répondra par e-mail.`, conNote: 'Autre chose à nous dire (facultatif)',
+    errEmpty: 'Saisissez votre prénom et votre nom tels qu’ils figurent sur la réservation.',
+    errNF: 'Aucune réservation en cours ou à venir à ce nom. Vérifiez l’orthographe de votre confirmation ou écrivez-nous.',
+    errConn: 'Impossible de joindre le système de réservation pour le moment. Réessayez dans quelques minutes ou écrivez-nous.',
+    errDemo: 'Mode démo : essayez María Fernández, James Whitaker ou Sophie Laurent.',
+    dirAns: 'Prenez l’entrée en face de Mystic Sushi ou l’entrée d’Invictus. Un 4x4 est recommandé, mais la route convient à tous les véhicules. L’itinéraire Waze est dans l’onglet Itinéraire.',
+    unknown: 'Je n’ai pas encore cette réponse. Je peux transmettre votre question à l’équipe, qui vous répondra par e-mail.'
+  },
+  de: {
+    portal: 'Gästeportal', welcome: 'Willkommen in Canavida',
+    intro: 'Geben Sie Vor- und Nachnamen der Person ein, auf die die Buchung läuft. Wir prüfen Ihren Aufenthalt direkt in unserem Buchungssystem.',
+    first: 'Vorname', last: 'Nachname', cta: 'Meine Buchung ansehen', ctaBusy: 'Buchung wird geprüft…', checking: 'Lodgify wird abgefragt…',
+    nfKicker: 'Buchung nicht gefunden', wa: 'Per WhatsApp schreiben', demo: 'Demomodus', logout: 'Abmelden',
+    stay: 'Ihr Aufenthalt', hello: 'Hallo', awaits: 'Wir freuen uns auf Sie in', arrival: 'Anreise', departure: 'Abreise',
+    cin: 'Check-in 15:00 Uhr', cout: 'Check-out 11:00 Uhr', guests: 'Gäste', nights: 'Nächte', bookingNo: 'Buchung Nr.',
+    improveT: 'Ihr Aufenthalt, noch besser', improveB: 'Die Optionen richten sich nach dem aktuellen Kalender Ihrer Villa. Das Team bestätigt jede Anfrage per E-Mail.',
+    extT: 'Aufenthalt verlängern', extD: n => `Bis zu ${n} freie Nacht${n > 1 ? 'e' : ''} nach Ihrer Abreise`, extNo: 'Ihre Villa ist nach Ihrer Abreise belegt',
+    earlyT: 'Früher Check-in', earlyD: 'Anreise zwischen 11:00 und 13:30 Uhr', earlyNo: 'An diesem Tag reist ein anderer Gast ab',
+    lateT: 'Später Check-out', lateD: 'Abreise bis 13:00 Uhr', lateNo: 'An diesem Tag reist ein anderer Gast an',
+    wineT: 'Flasche Wein', wineD: 'Erwartet Sie bei Ankunft in der Villa',
+    upT: 'Villa-Upgrade', upD: 'Mehr Schlafzimmer oder eine andere Villa, gleiche Daten',
+    rate: 'Preis per E-Mail', consult: 'Anfragen', na: 'Nicht verfügbar',
+    qT: 'Haben Sie Fragen?', qB: 'WLAN, Küche, Pool, Transport: Der Assistent antwortet sofort.', ask: 'Fragen',
+    toursK: 'Erlebnisse', toursT: 'Touren in Uvita und Umgebung', toursB: 'Wählen Sie ein Erlebnis und nennen Sie uns Ihr Wunschdatum. Das Team bestätigt Verfügbarkeit und Preis per E-Mail.', tbd: 'Zeit nach Absprache',
+    dirK: 'Anfahrt', dirT: 'Der Weg nach Canavida', s1L: 'Die Einfahrt', s1: 'Nehmen Sie die Einfahrt gegenüber von Mystic Sushi oder die Einfahrt von Invictus.',
+    s2L: 'Das Fahrzeug', s2: 'Ein 4x4 wird empfohlen, aber die Straße ist für alle Fahrzeuge befahrbar.', waze: 'Route in Waze öffnen',
+    airport: 'Vom Flughafen Juan Santamaría (SJO) sind es 167 km, je nach Verkehr 2,5 bis 3,5 Stunden. Mit einem Fahrzeug ohne Allrad empfehlen wir, beim ersten Mal bei Tageslicht anzukommen.',
+    chatK: 'Assistent', chatT: 'Fragen Sie uns', greet: (f, v) => `Hallo ${f}. Ich bin der Canavida-Assistent. Fragen Sie mich alles zu ${v}, Ihrer Anreise oder den Touren.`,
+    ph: 'Ihre Frage', toTeam: 'Meine Frage an das Team senden',
+    chips: ['WLAN', 'Brauche ich einen 4x4?', 'Gibt es eine Klimaanlage?', 'Wohin mit dem Müll?', 'Essen oder Taxi bestellen'],
+    tabRes: 'Buchung', tabDir: 'Anfahrt',
+    sentT: 'Anfrage gesendet', sentB: 'Das Canavida-Team hat Ihre Anfrage erhalten und bestätigt Verfügbarkeit und Zahlung in Kürze.', done: 'Fertig',
+    nightsL: 'Zusätzliche Nächte', dateL: 'Wunschdatum', pplL: 'Personen', noteL: 'Notiz für das Team (optional)', price: 'Preis',
+    sendErr: 'Die Anfrage konnte nicht gesendet werden. Bitte erneut versuchen oder per WhatsApp schreiben.', submit: 'Anfrage senden', sending: 'Wird gesendet…',
+    foot: 'Wird mit Ihren Buchungsdaten an das Canavida-Team gesendet.', map: 'Auf der Karte ansehen',
+    facts: { time: 'Zeiten', inc: 'Inklusive', recs: 'Mitbringen', restr: 'Einschränkungen', season: 'Saison' }, tourK: 'Tour', tourPh: 'Alter, Sprache, Fragen…',
+    extK: 'Ihre Villa ist frei', extB: n => `Direkt nach Ihrer Abreise ${n > 1 ? `sind ${n} Nächte` : 'ist 1 Nacht'} frei. Wählen Sie, wie viele Sie hinzufügen möchten; das Team schickt Ihnen den Preis per E-Mail.`, extPrice: 'Per E-Mail',
+    earlyK: 'Frühe Anreise', earlyB: 'Anreise zwischen 11:00 und 13:30 Uhr statt 15:00 Uhr. An diesem Tag reist kein anderer Gast aus Ihrer Villa ab.', earlyPh: 'Ungefähre Ankunftszeit',
+    lateK: 'Späte Abreise', lateB: 'Zwei Stunden länger: Abreise bis 13:00 Uhr statt 11:00 Uhr. An diesem Tag reist niemand in Ihrer Villa an.',
+    wineK: 'Zur Ankunft', wineB: 'Eine Flasche Wein erwartet Sie in der Villa. Sagen Sie uns, ob Sie Rot, Weiß oder Sekt bevorzugen.', winePh: 'Rot, Weiß oder Sekt',
+    upK: 'Villa wechseln', upB: 'Brauchen Sie mehr Schlafzimmer oder eine andere Villa? Wir prüfen, was zu Ihren Daten frei ist, und senden Ihnen die Optionen.', upNote: 'Was suchen Sie?', upPh: 'Ein Zimmer mehr, Klimaanlage überall…',
+    conT: 'An das Team senden', conB: q => `Ihre Frage: „${q}“\nDas Team antwortet per E-Mail.`, conNote: 'Sonst noch etwas (optional)',
+    errEmpty: 'Geben Sie Vor- und Nachnamen so ein, wie sie in der Buchung stehen.',
+    errNF: 'Unter diesem Namen gibt es keine aktuelle oder kommende Buchung. Prüfen Sie die Schreibweise in Ihrer Bestätigung oder schreiben Sie uns.',
+    errConn: 'Das Buchungssystem ist gerade nicht erreichbar. Bitte versuchen Sie es in einigen Minuten erneut oder schreiben Sie uns.',
+    errDemo: 'Demomodus: Versuchen Sie María Fernández, James Whitaker oder Sophie Laurent.',
+    dirAns: 'Nehmen Sie die Einfahrt gegenüber von Mystic Sushi oder die Einfahrt von Invictus. Ein 4x4 wird empfohlen, aber die Straße ist für alle Fahrzeuge befahrbar. Die Waze-Route finden Sie im Tab Anfahrt.',
+    unknown: 'Darauf habe ich noch keine Antwort. Ich kann Ihre Frage an das Team weiterleiten; es antwortet per E-Mail.'
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: 'es', first: '', last: '', loading: false, error: '', errKey: '', res: null, demo: false, tab: 'reserva',
+    sheet: null, form: { date: '', people: '', note: '', nights: 1 }, sending: false, sent: false, sendErr: false,
+    msgs: [], draft: '', thinking: false, trans: {} };
+  pending = new Set();
+
+  componentDidMount() {
+    const t = setInterval(() => {
+      if (!window.CANAVIDA) return;
+      clearInterval(t);
+      const s0 = this.props.startScreen;
+      if (s0 && s0 !== 'landing' && !this.state.res) this.setState({ res: this.demoLookup('María', 'Fernández'), demo: true, tab: s0 });
+      else this.forceUpdate();
+    }, 100);
+    if (this.props.snapshot) {
+      const s0 = this.props.startScreen;
+      if (s0 && s0 !== 'landing' && window.CANAVIDA) this.setState({ res: this.demoLookup('María', 'Fernández'), demo: true, tab: s0 });
+      return;
+    }
+    let lang = 'es';
+    try { lang = localStorage.getItem(LKEY) || (navigator.language || 'es').slice(0, 2); } catch (e) {}
+    if (this.props.lang && this.props.lang !== 'auto') lang = this.props.lang;
+    if (!STR[lang]) lang = 'es';
+    this.setState({ lang });
+    const start = this.props.startScreen;
+    if (start && start !== 'landing') { this.setState({ res: this.demoLookup('María', 'Fernández'), demo: true, tab: start }); return; }
+    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.res) this.setState({ res: s.res, demo: !!s.demo }); } catch (e) {}
+  }
+  componentDidUpdate(prev) {
+    const p = this.props;
+    if (prev.startScreen !== p.startScreen && p.startScreen) {
+      if (p.startScreen === 'landing') this.setState({ res: null });
+      else this.setState({ res: this.state.res || this.demoLookup('María', 'Fernández'), demo: this.state.res ? this.state.demo : true, tab: p.startScreen });
+    }
+    if (prev.lang !== p.lang && p.lang && STR[p.lang]) this.setState({ lang: p.lang });
+    this.ensureTrans();
+  }
+
+  D() { return window.CANAVIDA || { tours: [], faq: [], reservations: [], whatsapp: '50687942201' }; }
+  api(p) { return (this.props.apiBase || '') + p; }
+  isJson(r) { return (r.headers.get('content-type') || '').includes('json'); }
+  setLang(lang) { try { localStorage.setItem(LKEY, lang); } catch (e) {} this.setState({ lang }); }
+
+  // Tours: ES/EN from the repo; FR/DE translated by the Worker (Workers AI) and cached in D1.
+  tx(en) { const L = this.state.lang; return (this.state.trans[L] || {})[en] || en; }
+  tourText(tour, field) {
+    const L = this.state.lang, es = tour.es || {}, en = tour.en || {};
+    if (field === 'title') return clean(L === 'es' ? tour.title.es : L === 'en' ? tour.title.en : this.tx(clean(tour.title.en)));
+    const v = L === 'es' ? (es[field] || en[field]) : (en[field] || es[field]);
+    return clean(L === 'fr' || L === 'de' ? this.tx(clean(v)) : v);
+  }
+  neededTexts() {
+    const L = this.state.lang; if (L !== 'fr' && L !== 'de' || !this.state.res) return [];
+    const out = [];
+    if (this.state.tab === 'tours') for (const t of this.D().tours || []) { out.push(clean(t.title.en)); if (t.en?.time) out.push(clean(t.en.time)); }
+    const s = this.state.sheet;
+    if (s && s.kind === 'tour') for (const f of ['desc', 'time', 'inc', 'recs', 'restr', 'season']) if (s.tour.en?.[f]) out.push(clean(s.tour.en[f]));
+    const have = this.state.trans[L] || {};
+    return out.filter(x => x && !have[x] && !this.pending.has(L + x));
+  }
+  async ensureTrans() {
+    const L = this.state.lang, texts = this.neededTexts();
+    if (!texts.length || this.state.demo) return;
+    texts.forEach(x => this.pending.add(L + x));
+    try {
+      const r = await fetch(this.api('/api/traducir'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: L, texts }) });
+      if (!this.isJson(r)) return;
+      const d = await r.json();
+      if (!d.out) return;
+      this.setState(s => ({ trans: { ...s.trans, [L]: { ...(s.trans[L] || {}), ...Object.fromEntries(texts.map((x, i) => [x, d.out[i] || x])) } } }));
+    } catch (e) {}
+  }
+
+  demoLookup(first, last) {
+    const parts = norm(last).split(/\s+/).filter(Boolean), f = norm(first);
+    const list = this.D().reservations || [];
+    const i = list.findIndex(x => { const n = norm(x.name); return n.includes(f) && parts.some(a => n.includes(a)); });
+    if (i < 0) return null;
+    const b = list[i], [fn, ...rest] = b.name.split(' ');
+    return { first: fn, last: rest.join(' '), villa: b.villa, arrival: b.arrive, departure: b.depart, guests: b.guests, code: b.code,
+      nights: Math.round((new Date(b.depart) - new Date(b.arrive)) / 864e5), offers: DEMO_OFFERS[i % 3] };
+  }
+
+  async lookup(e) {
+    e && e.preventDefault();
+    const { first, last } = this.state;
+    if (!first.trim() || !last.trim()) return this.setState({ errKey: 'errEmpty' });
+    this.setState({ loading: true, errKey: '' });
+    const t0 = Date.now();
+    let res = null, demo = false, errKey = '';
+    if (!this.props.forceDemo) {
+      try {
+        const r = await fetch(this.api(`/api/reserva?nombre=${encodeURIComponent(first)}&apellidos=${encodeURIComponent(last)}`));
+        if (!this.isJson(r)) throw new Error('no-backend');
+        const d = await r.json();
+        if (d.notFound) errKey = 'errNF'; else if (d.error) errKey = 'errConn'; else res = d;
+      } catch (x) { demo = true; }
+    } else demo = true;
+    if (demo) { res = this.demoLookup(first, last); if (!res) errKey = 'errDemo'; }
+    await wait(Math.max(0, 900 - (Date.now() - t0)));
+    if (!res) return this.setState({ loading: false, errKey });
+    try { localStorage.setItem(KEY, JSON.stringify({ res, demo })); } catch (x) {}
+    this.setState({ loading: false, res, demo, tab: 'reserva', msgs: [] });
+    window.scrollTo(0, 0);
+  }
+
+  logout() {
+    try { localStorage.removeItem(KEY); } catch (x) {}
+    this.setState({ res: null, first: '', last: '', errKey: '', msgs: [], sheet: null, tab: 'reserva' });
+  }
+
+  openSheet(sheet) {
+    this.setState({ sheet, sent: false, sendErr: false, form: { date: '', people: String(this.state.res?.guests || ''), note: '', nights: 1 } });
+  }
+
+  sheetModel(t) {
+    const s = this.state.sheet; if (!s) return {};
+    const n = this.state.res?.offers?.extendNights || 0;
+    const base = { noteLabel: t.noteL, notePh: '', facts: [], loc: '', body: '', price: '' };
+    switch (s.kind) {
+      case 'extend': return { ...base, kicker: t.extK, title: t.extT, body: t.extB(n), showNights: true, price: t.extPrice };
+      case 'early': return { ...base, kicker: t.earlyK, title: t.earlyT, body: t.earlyB, price: P22, notePh: t.earlyPh };
+      case 'late': return { ...base, kicker: t.lateK, title: t.lateT, body: t.lateB, price: P22 };
+      case 'wine': return { ...base, kicker: t.wineK, title: t.wineT, body: t.wineB, price: WINE, notePh: t.winePh };
+      case 'upgrade': return { ...base, kicker: t.upK, title: t.upT, body: t.upB, noteLabel: t.upNote, notePh: t.upPh };
+      case 'consulta': return { ...base, kicker: t.chatK, title: t.conT, body: t.conB(s.q), noteLabel: t.conNote };
+      case 'tour': {
+        const tr = s.tour;
+        const facts = ['time', 'inc', 'recs', 'restr', 'season'].map(f => ({ label: t.facts[f], value: this.tourText(tr, f) })).filter(x => x.value);
+        return { ...base, kicker: t.tourK, title: this.tourText(tr, 'title'), body: this.tourText(tr, 'desc'), facts, loc: tr.es?.loc || tr.loc || '', showTourFields: true, notePh: t.tourPh };
+      }
+    }
+    return base;
+  }
+
+  async submit() {
+    const { sheet, form, res, demo, lang } = this.state;
+    const detalle = { 'Idioma del huésped': lang.toUpperCase() };
+    if (sheet.kind === 'extend') detalle['Noches extra'] = form.nights;
+    if (sheet.kind === 'wine') detalle['Precio'] = WINE;
+    if (sheet.kind === 'early' || sheet.kind === 'late') detalle['Precio'] = P22;
+    if (sheet.kind === 'tour') { detalle['Tour'] = clean(sheet.tour.title.es); detalle['Fecha deseada'] = form.date || 'Por definir'; detalle['Personas'] = form.people; }
+    if (sheet.kind === 'consulta') detalle['Pregunta'] = sheet.q;
+    if (form.note.trim()) detalle['Nota'] = form.note.trim();
+    this.setState({ sending: true, sendErr: false });
+    try {
+      if (demo) await wait(900);
+      else {
+        const r = await fetch(this.api('/api/solicitud'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code: res.code, tipo: sheet.kind, detalle }) });
+        const d = this.isJson(r) ? await r.json() : {};
+        if (!d.ok) throw new Error(d.error || 'error');
+      }
+      this.setState({ sending: false, sent: true });
+    } catch (e) { this.setState({ sending: false, sendErr: true }); }
+  }
+
+  localAnswer(q, t) {
+    const n = norm(q), L = this.state.lang;
+    if (/llegar|entrada|direcci|waze|ubicaci|directions|entrance|itineraire|anfahrt|einfahrt/.test(n)) return { reply: t.dirAns, handoff: false };
+    let best = null, score = 0;
+    for (const f of this.D().faq || []) {
+      const s = (f.kw || []).reduce((a, k) => a + (n.includes(norm(k)) ? 1 : 0), 0);
+      if (s > score) { score = s; best = f; }
+    }
+    if (best) return { reply: clean(L === 'es' ? best.a.es : best.a.en), handoff: false };
+    return { reply: t.unknown, handoff: true };
+  }
+
+  async ask(text) {
+    const t = STR[this.state.lang];
+    text = (text ?? this.state.draft).trim();
+    if (!text || this.state.thinking) return;
+    const msgs = [...this.state.msgs, { role: 'user', text }];
+    this.setState({ msgs, draft: '', thinking: true }, () => window.scrollTo(0, document.body.scrollHeight));
+    let reply, handoff = false;
+    try {
+      if (this.state.demo) throw 0;
+      const r = await fetch(this.api('/api/chat'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: this.state.lang, reserva: this.state.res, messages: msgs.map(m => ({ role: m.role, content: m.text })) }) });
+      if (!this.isJson(r)) throw 0;
+      const d = await r.json();
+      if (!d.reply) throw 0;
+      reply = d.reply; handoff = !!d.handoff;
+    } catch (e) { const l = this.localAnswer(text, t); reply = l.reply; handoff = l.handoff; await wait(700); }
+    this.setState(s => ({ thinking: false, msgs: [...s.msgs, { role: 'assistant', text: reply, handoff, q: text }] }), () => window.scrollTo(0, document.body.scrollHeight));
+  }
+
+  renderVals() {
+    const st = this.state, D = this.D(), res = st.res, L = st.lang, t = STR[L] || STR.es;
+    const o = res?.offers || {};
+    const fmt = iso => iso ? new Date(iso.slice(0, 10) + 'T12:00:00').toLocaleDateString(LOCALE[L], { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    const go = tab => () => { this.setState({ tab }); window.scrollTo(0, 0); };
+    const villaPhoto = !res ? 'villa-1.jpg' : /colibr/i.test(res.villa) ? 'villa-colibri.jpg'
+      : ['villa-1.jpg', 'villa-3.jpg', 'villa-4.jpg', 'villa-2.jpg'][[...res.villa].reduce((a, c) => a + c.charCodeAt(0), 0) % 4];
+    const row = (key, title, okDesc, price, ok, noDesc) => ({
+      title, desc: ok ? okDesc : noDesc, status: ok ? price : t.na, disabled: !ok, opacity: ok ? 1 : 0.45,
+      onClick: () => ok && this.openSheet({ kind: key })
+    });
+    const en = o.extendNights || 0;
+    const offers = res ? [
+      row('extend', t.extT, t.extD(en), t.rate, en > 0, t.extNo),
+      row('early', t.earlyT, t.earlyD, '$22', !!o.early, t.earlyNo),
+      row('late', t.lateT, t.lateD, '$22', !!o.late, t.lateNo),
+      row('wine', t.wineT, t.wineD, WINE, true, ''),
+      row('upgrade', t.upT, t.upD, t.consult, true, '')
+    ] : [];
+    const tours = (D.tours || []).map((tr, i) => ({
+      n: String(i + 1).padStart(2, '0'), title: this.tourText(tr, 'title'), time: (this.tourText(tr, 'time') || t.tbd).split('\n')[0],
+      onClick: () => this.openSheet({ kind: 'tour', tour: tr })
+    }));
+    const greet = { text: res ? t.greet(res.first, res.villa) : '', isBot: true, isUser: false, handoff: false };
+    const msgs = [greet, ...st.msgs.map(m => ({ text: m.text, isUser: m.role === 'user', isBot: m.role !== 'user', handoff: !!m.handoff, onHandoff: () => this.openSheet({ kind: 'consulta', q: m.q }) }))];
+    const chips = t.chips.map(label => ({ label, onClick: () => this.ask(label) }));
+    const tabs = ['reserva', 'tours', 'llegar', 'chat'];
+    const pick = (a, b) => Object.fromEntries(tabs.map(x => [x, x === st.tab ? a : b]));
+    const nightOpts = Array.from({ length: en }, (_, i) => i + 1).map(n => ({
+      label: '+' + n, border: st.form.nights === n ? 'var(--color-accent)' : 'var(--color-divider)', color: st.form.nights === n ? 'var(--color-accent-700)' : 'var(--color-text)',
+      onClick: () => this.setState(s => ({ form: { ...s.form, nights: n } }))
+    }));
+    const setF = k => e => { const v = e.target.value; this.setState(s => ({ form: { ...s.form, [k]: v } })); };
+    const langs = LANGS.map(([code, label, name]) => ({
+      code: label, name, onClick: () => this.setLang(code),
+      border: code === L ? 'var(--color-accent)' : 'var(--color-divider)', color: code === L ? 'var(--color-accent-700)' : 'var(--color-neutral-700)'
+    }));
+
+    return {
+      t, langs, isLanding: !res, isApp: !!res, demo: st.demo,
+      first: st.first, last: st.last, loading: st.loading, error: st.errKey ? t[st.errKey] : '', hasError: !!st.errKey,
+      ctaLabel: st.loading ? t.ctaBusy : t.cta,
+      waLink: 'https://wa.me/' + (D.whatsapp || '50687942201'),
+      onFirst: e => this.setState({ first: e.target.value }), onLast: e => this.setState({ last: e.target.value }),
+      onLookup: e => this.lookup(e), onLogout: () => this.logout(),
+      res: res || {}, villaPhoto, arriveFmt: fmt(res?.arrival), departFmt: fmt(res?.departure),
+      nights: res ? (res.nights || Math.round((new Date(res.departure) - new Date(res.arrival)) / 864e5)) : '',
+      offers, tours, msgs, chips, showChips: st.msgs.length === 0, thinking: st.thinking,
+      draft: st.draft, onDraft: e => this.setState({ draft: e.target.value }), onAsk: e => { e.preventDefault(); this.ask(); },
+      goChat: go('chat'),
+      tabIs: Object.fromEntries(tabs.map(x => [x, st.tab === x])),
+      tab: Object.fromEntries(tabs.map(x => [x, go(x)])),
+      tabColor: pick('var(--color-accent-700)', 'var(--color-neutral-700)'),
+      tabLine: pick('var(--color-accent)', 'transparent'),
+      hasSheet: !!st.sheet, sh: this.sheetModel(t), sent: st.sent, notSent: !st.sent, sending: st.sending, sendErr: st.sendErr ? t.sendErr : '',
+      submitLabel: st.sending ? t.sending : t.submit,
+      nightOpts, form: st.form, onDate: setF('date'), onPeople: setF('people'), onNote: setF('note'),
+      onSubmit: () => this.submit(), closeSheet: () => this.setState({ sheet: null }), stop: e => e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

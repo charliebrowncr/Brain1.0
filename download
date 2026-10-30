@@ -1,0 +1,9 @@
+worker.js
+wrangler.toml
+schema.sql
+.assetsignore
+*.md
+Guia de despliegue.dc.html
+.git
+.wrangler
+node_modules
