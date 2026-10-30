@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/classical-2b9a4656-8dcc-4d47-8d3d-afb5d2459be8/styles.css">
+<script src="_ds/classical-2b9a4656-8dcc-4d47-8d3d-afb5d2459be8/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-600)}code{font-family:ui-monospace,Menlo,monospace;font-size:.86em;background:var(--color-surface);padding:1px 5px;border-radius:2px}</style>
+</helmet>
+<div style="max-width:760px;margin:0 auto;padding:48px 24px 96px;font-family:var(--font-body);color:var(--color-text);line-height:1.6">
+
+<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700)">Canavida · App de huéspedes</div>
+<h1 style="font-size:46px;font-weight:400;line-height:1.05;margin:8px 0 12px">Publicar en Cloudflare, paso a paso</h1>
+<p style="margin:0;color:var(--color-neutral-800);text-align:justify;text-wrap:pretty">Unos 40 minutos, todo desde el navegador. Haga los pasos en orden: cada uno depende del anterior. Al final de cada paso hay una forma de comprobar que quedó bien.</p>
+
+<div style="margin:32px 0;border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:20px 22px;display:flex;flex-direction:column;gap:8px">
+  <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-800)">Antes de empezar</div>
+  <h3 style="margin:0;font-weight:600">Qué ya está hecho y qué le toca a usted</h3>
+  <p style="margin:0;text-align:justify"><strong>Ya está hecho:</strong> la app en 4 idiomas, el servidor que habla con Lodgify, la lógica de disponibilidad, el envío de correos y el asistente. <strong>Le toca a usted:</strong> crear las cuentas y pegar las llaves (pasos 3 a 7). Yo no puedo entrar a su Cloudflare ni a su Lodgify; esos pasos solo los puede hacer el dueño de las cuentas.</p>
+  <p style="margin:0;text-align:justify">La conexión con Lodgify no usa usuario ni contraseña: Lodgify da una <strong>API key</strong> para que otros sistemas lean las reservas. Esa llave se guarda como secreto dentro de Cloudflare.</p>
+</div>
+
+<h2 style="font-size:30px;font-weight:400;margin:40px 0 12px">Cómo se conecta todo</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--color-divider);border-left:1px solid var(--color-divider);font-size:13.5px">
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">Teléfono del huésped</div>Abre el enlace y escribe nombre y apellidos.</div>
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">Cloudflare Worker</div>Sirve la app y guarda las llaves en secreto. Es el único que habla con Lodgify.</div>
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">Lodgify API</div>Reservas en curso y próximas. De ahí salen fechas, villa, huéspedes y la disponibilidad de extras.</div>
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">D1 (base de datos)</div>Caché de 10 min, memoria del asistente, traducciones y registro de solicitudes.</div>
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">Workers AI</div>El asistente. Responde con las preguntas frecuentes del repositorio.</div>
+  <div style="padding:14px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div style="font-family:var(--font-heading);font-size:19px;font-weight:600">Resend</div>Envía cada solicitud a admicanavida@gmail.com.</div>
+</div>
+<p style="font-size:13.5px;color:var(--color-neutral-700);text-align:justify;margin-top:12px">Cómo se decide qué extras se habilitan: el Worker mira las otras reservas de la misma villa. <strong>Early check-in</strong> solo si nadie sale ese día; <strong>late check-out</strong> solo si nadie llega ese día; <strong>extender</strong> cuenta cuántas noches seguidas quedan libres después de la salida (máx. 3). El vino ($40) y el upgrade siempre se pueden solicitar. La tarifa de la extensión no se muestra en la app: la solicitud llega a admicanavida@gmail.com y el equipo responde con el precio.</p>
+<p style="font-size:13.5px;color:var(--color-neutral-700);text-align:justify;margin-top:8px"><strong>Idiomas:</strong> la interfaz está escrita en español, inglés, francés y alemán. Los tours ya vienen en español e inglés; para francés y alemán, el Worker los traduce con Workers AI la primera vez y guarda la traducción en D1. El asistente contesta en el idioma elegido.</p>
+
+<h2 style="font-size:30px;font-weight:400;margin:40px 0 4px">Archivos del proyecto</h2>
+<table class="table" style="font-size:13.5px">
+  <tbody>
+    <tr><td><code>Canavida App.dc.html</code></td><td>La app (landing, reserva, tours, cómo llegar, asistente).</td></tr>
+    <tr><td><code>canavida-data.js</code></td><td>Tours y preguntas frecuentes (del repositorio Agentecanavida). Edítelo para cambiar textos.</td></tr>
+    <tr><td><code>support.js</code>, <code>_ds/</code>, fotos</td><td>Lo que la app necesita para verse. No los toque.</td></tr>
+    <tr><td><code>worker.js</code></td><td>El servidor: Lodgify, correo y asistente.</td></tr>
+    <tr><td><code>wrangler.toml</code></td><td>Configuración que lee Cloudflare.</td></tr>
+    <tr><td><code>schema.sql</code></td><td>Crea las tablas de la base de datos.</td></tr>
+    <tr><td><code>.assetsignore</code></td><td>Evita que el código del servidor quede público.</td></tr>
+  </tbody>
+</table>
+
+<div style="display:flex;flex-direction:column;margin-top:40px;border-top:1px solid var(--color-divider)">
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">1</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Descargar el proyecto</h3>
+  <p style="margin:0">Descargue este proyecto como .zip y descomprímalo en su computadora. Debe ver los archivos de la tabla anterior en la misma carpeta.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">2</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Subir a GitHub (repositorio Brain1.0)</h3>
+  <ol style="margin:0;padding-left:20px">
+    <li>Abra <a href="https://github.com/charliebrowncr/Brain1.0" target="_blank" rel="noopener">github.com/charliebrowncr/Brain1.0</a> (hoy está vacío).</li>
+    <li>Clic en <em>uploading an existing file</em>.</li>
+    <li>Arrastre <strong>todo el contenido</strong> de la carpeta (no la carpeta en sí). <code>wrangler.toml</code> debe quedar en la raíz.</li>
+    <li><em>Commit changes</em>.</li>
+  </ol>
+  <p style="margin:8px 0 0;font-size:13.5px;color:var(--color-neutral-700)">Comprobar: en la página del repositorio ve <code>wrangler.toml</code> y <code>worker.js</code> en la lista principal. El archivo <code>.assetsignore</code> empieza con punto; si su computadora lo oculta, créelo en GitHub con <em>Add file → Create new file</em> y pegue su contenido.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">3</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Crear la base de datos D1</h3>
+  <ol style="margin:0;padding-left:20px">
+    <li>Entre a <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">dash.cloudflare.com</a> (cree la cuenta si no la tiene; es gratis).</li>
+    <li>Menú: <em>Storage &amp; Databases → D1 SQL Database</em>. Si ya existe <code>canavida</code> (del repositorio Brain), úsela. Si no: <em>Create database</em> → nombre <code>canavida</code>.</li>
+    <li>Copie el <strong>Database ID</strong> (código largo).</li>
+    <li>Pestaña <em>Console</em> → pegue todo <code>schema.sql</code> → <em>Execute</em>.</li>
+  </ol>
+  <p style="margin:8px 0 0;font-size:13.5px;color:var(--color-neutral-700)">Comprobar: en <em>Tables</em> aparecen cache, knowledge, conversaciones, traducciones y solicitudes.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">4</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Pegar el ID en wrangler.toml</h3>
+  <p style="margin:0">En GitHub abra <code>wrangler.toml</code> → lápiz (Edit) → reemplace <code>PEGUE-AQUI-EL-ID-DE-SU-D1</code> por el Database ID → <em>Commit changes</em>.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">5</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Obtener las dos llaves</h3>
+  <p style="margin:0 0 6px"><strong>Lodgify:</strong> <em>Settings → Public API</em> → copie la API key. (No está disponible en el plan Starter.)</p>
+  <p style="margin:0"><strong>Resend</strong> (envía los correos): cree una cuenta gratis en <a href="https://resend.com" target="_blank" rel="noopener">resend.com</a> <strong>con el correo admicanavida@gmail.com</strong>. Sin dominio propio, Resend solo envía al correo dueño de la cuenta, que es justo lo que necesitamos. Luego <em>API Keys → Create API key</em> → cópiela.</p>
+  <p style="margin:8px 0 0;font-size:13.5px;color:var(--color-neutral-700)">Guarde ambas llaves en un lugar seguro. Nunca las pegue en GitHub.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">6</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Conectar GitHub con Cloudflare</h3>
+  <ol style="margin:0;padding-left:20px">
+    <li>Cloudflare → <em>Workers &amp; Pages → Create → Import a repository</em>.</li>
+    <li><em>Connect GitHub</em> → autorice → elija <code>Brain1.0</code>.</li>
+    <li>Project name: <code>canavida-app</code> · Build command: vacío · Deploy command: <code>npx wrangler deploy</code> · Root directory: vacío.</li>
+    <li><em>Deploy</em>. En 1–2 minutos le da una dirección como <code>https://canavida-app.SU-USUARIO.workers.dev</code>.</li>
+  </ol>
+  <p style="margin:8px 0 0;font-size:13.5px;color:var(--color-neutral-700)">Comprobar: abra la dirección y verá la pantalla de bienvenida. Desde ahora, cada cambio que suba a GitHub se publica solo.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">7</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Guardar los secretos</h3>
+  <p style="margin:0 0 6px"><code>canavida-app</code> → <em>Settings → Variables and Secrets → Add</em>, dos veces, tipo <strong>Secret</strong>:</p>
+  <table class="table" style="font-size:13.5px"><tbody>
+    <tr><td><code>LODGIFY_API_KEY</code></td><td>la llave de Lodgify</td></tr>
+    <tr><td><code>RESEND_API_KEY</code></td><td>la llave de Resend</td></tr>
+  </tbody></table>
+  <p style="margin:8px 0 0">Guarde y vuelva a desplegar (<em>Deployments → Retry/Redeploy</em>).</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">8</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Probar con una reserva real</h3>
+  <p style="margin:0 0 6px">Abra, con el nombre de un huésped con reserva próxima:</p>
+  <p style="margin:0 0 8px;word-break:break-all"><code>https://canavida-app.SU-USUARIO.workers.dev/api/reserva?nombre=Ana&amp;apellidos=Rojas</code></p>
+  <table class="table" style="font-size:13.5px"><tbody>
+    <tr><td>Ve sus datos y <code>offers</code></td><td>Funciona. Pruebe en la app.</td></tr>
+    <tr><td><code>{"notFound":true}</code></td><td>La llave sirve; el nombre no coincide con Lodgify.</td></tr>
+    <tr><td><code>API key incorrecta</code></td><td>Revise el secreto LODGIFY_API_KEY.</td></tr>
+    <tr><td>Error de D1</td><td>Revise el paso 3 y 4.</td></tr>
+  </tbody></table>
+  <p style="margin:8px 0 0">Luego, en la app, pida un vino de prueba. Debe llegar un correo a admicanavida@gmail.com con nombre, villa, fechas, correo y teléfono del huésped (revise Spam la primera vez y márquelo como “No es spam”).</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">9</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Compartir con los huéspedes</h3>
+  <p style="margin:0">Ponga el enlace en el mensaje automático de confirmación de Lodgify. En el teléfono pueden usar “Agregar a pantalla de inicio” y queda como una app. Dominio propio (opcional): <em>Settings → Domains &amp; Routes → Add → Custom domain</em>, por ejemplo <code>huespedes.canavidaresort.com</code>.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:52px 1fr;gap:16px;padding:24px 0;border-bottom:1px solid var(--color-divider)">
+  <span style="font-family:var(--font-heading);font-size:48px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--color-accent);font-feature-settings:'tnum'">10</span>
+  <div><h3 style="margin:0 0 6px;font-weight:600">Enseñarle al asistente (cada semana)</h3>
+  <p style="margin:0 0 6px">D1 → <code>canavida</code> → <em>Console</em>. Ver qué preguntaron:</p>
+  <p style="margin:0 0 8px"><code>SELECT pregunta, respuesta FROM conversaciones ORDER BY id DESC LIMIT 50;</code></p>
+  <p style="margin:0 0 6px">Agregar una respuesta correcta (se usa de inmediato):</p>
+  <p style="margin:0 0 8px"><code>INSERT INTO knowledge (pregunta, respuesta) VALUES ('Clave del portón', 'Se envía por WhatsApp el día de llegada.');</code></p>
+  <p style="margin:0">Para cambiar tours o respuestas largas, edite <code>canavida-data.js</code> en GitHub; se publica solo.</p></div>
+</div>
+
+</div>
+
+<h2 style="font-size:30px;font-weight:400;margin:40px 0 8px">Si algo falla</h2>
+<p style="margin:0;text-align:justify">Cloudflare → <code>canavida-app</code> → <em>Observability → Logs</em> muestra el error exacto. Cópielo y envíemelo. Mientras el Worker no responda, la app entra sola en <em>Modo demo</em> con las tres reservas de ejemplo (María Fernández, James Whitaker, Sophie Laurent).</p>
+
+<h2 style="font-size:30px;font-weight:400;margin:40px 0 8px">Decisiones de seguridad</h2>
+<ul style="margin:0;padding-left:20px;text-align:justify">
+  <li>La app solo recibe nombre, villa, fechas, huéspedes y número de reserva. Correo, teléfono y montos nunca salen del Worker; solo viajan en el correo al equipo.</li>
+  <li>Buscar por nombre es cómodo pero adivinable. Si quiere más seguridad, se puede pedir también el número de reserva o los últimos 4 dígitos del teléfono.</li>
+</ul>
+
+</div>
+</x-dc>
+</body>
+</html>
